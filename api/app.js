@@ -34,11 +34,12 @@ app.get("/rank", async (req, res) => {
 });
 
 
-app.get("/game", async (req, res) => {
+app.get("/partido", async (req, res) => {
   const user = req.query.user ;
 
   try {
     const r = await fetch(`https://soloboom.net/api/streaming/${user}`);
+    console.log(r)
     const data = await r.json();
      res.type("text").send(data); // solo el mensaje limpio
   } catch (e) {
@@ -47,6 +48,8 @@ app.get("/game", async (req, res) => {
 });
 
 
+
 export default app;
+
 
 
