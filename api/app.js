@@ -33,24 +33,33 @@ app.get("/rank", async (req, res) => {
   }
 });
 
-
 app.get("/partido", async (req, res) => {
   const user = req.query.user;
 
   try {
     const r = await fetch(`https://soloboom.net/api/streaming/${user}`, {
       headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "application/json"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "Accept": "application/json, text/plain, */*"
       }
     });
 
-    const data = await r.json();
-  
+    const raw = await r.text();
 
-       res.type("text").send(data.message); // ← AQUÍ EL CAMBIO
+    // Si devuelve HTML, lo detectamos
+    if (raw.trim().startsWith("<")) {
+      console.log("Desde Vercel devuelven HTML, no JSON:", raw.slice(0, 200));
+      return res
+        .status(500)
+        .send("El servidor externo bloqueó la petición desde Vercel.");
+    }
+
+    const data = JSON.parse(raw);
+
+    res.type("text").send(data.message);
+
   } catch (e) {
-    console.log(e);
+    console.log("ERROR:", e);
     res.status(500).json({ error: "El jugador no está jugando" });
   }
 });
@@ -58,6 +67,7 @@ app.get("/partido", async (req, res) => {
 
 
 export default app;
+
 
 
 
