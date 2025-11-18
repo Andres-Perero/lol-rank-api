@@ -40,7 +40,7 @@ app.get("/game", async (req, res) => {
   try {
     const r = await fetch(`https://soloboom.net/api/streaming/${user}`);
     const data = await r.json();
-     res.type("text").send(result); // solo el mensaje limpio
+     res.type("text").send(data); // solo el mensaje limpio
   } catch (e) {
     res.send("El jugador no esta jugando, o no se actualizo aun");
   }
@@ -48,4 +48,5 @@ app.get("/game", async (req, res) => {
 
 
 export default app;
+
 
