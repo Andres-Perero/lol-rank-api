@@ -35,21 +35,30 @@ app.get("/rank", async (req, res) => {
 
 
 app.get("/partido", async (req, res) => {
-  const user = req.query.user ;
+  const user = req.query.user;
 
   try {
-    const r = await fetch(`https://soloboom.net/api/streaming/${user}`);
-    console.log(r)
+    const r = await fetch(`https://soloboom.net/api/streaming/${user}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
+      }
+    });
+
     const data = await r.json();
-     res.type("text").send(data); // solo el mensaje limpio
+  
+
+       res.type("text").send(data.message); // ← AQUÍ EL CAMBIO
   } catch (e) {
-    res.send("El jugador no esta jugando, o no se actualizo aun");
+    console.log(e);
+    res.status(500).json({ error: "El jugador no está jugando" });
   }
 });
 
 
 
 export default app;
+
 
 
 
