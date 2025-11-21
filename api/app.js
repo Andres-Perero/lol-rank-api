@@ -33,7 +33,7 @@ app.get("/rank", async (req, res) => {
         <div id="wl">W ${solo.wins} | L ${solo.losses}</div>
 
         <script>
-          setInterval(() => location.reload(), 900000);
+          setInterval(() => location.reload(), 600000);
         </script>
       </body>
     </html>
@@ -83,6 +83,7 @@ app.get("/partido", async (req, res) => {
 
 
 export default app;
+
 
 
 
