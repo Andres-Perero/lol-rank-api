@@ -12,7 +12,7 @@ app.use(cors());
 
 app.get("/rank", async (req, res) => {
   try {
-    const { gameName, tagLine, region } = req.query;
+    const { gameName, tagLine, region, widget } = req.query;
     if (!gameName || !tagLine || !region) return res.status(400).send("Faltan parámetros");
 
     const account = await getAccount(gameName, tagLine, region);
@@ -26,7 +26,23 @@ app.get("/rank", async (req, res) => {
     const tier = solo.tier === "UNRANKED" ? "Unranked" : `${solo.tier} ${solo.rank}`;
     const result = `${nick} ${region.toUpperCase()} • ${tier} (${solo.leaguePoints}LPs) • W ${solo.wins} | L ${solo.losses}`;
 
-    res.type("text").send(result);
+    if (widget === 'true') {
+      res.type("html").send(`
+    <html>
+      <body style="background:transparent;color:white;font-size:140px;text-align:center;display:flex;justify-content:center;align-items:center;height:100%;">
+        <div id="wl">W ${solo.wins} | L ${solo.losses}</div>
+
+        <script>
+          setInterval(() => location.reload(), 900000);
+        </script>
+      </body>
+    </html>
+  `);
+      return;
+    }
+    else {
+      res.type("text").send(result);
+    }
 
   } catch (e) {
     res.status(500).send("Error: " + e.message);
@@ -67,6 +83,7 @@ app.get("/partido", async (req, res) => {
 
 
 export default app;
+
 
 
 
