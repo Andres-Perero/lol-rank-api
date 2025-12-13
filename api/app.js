@@ -80,9 +80,58 @@ app.get("/partido", async (req, res) => {
   }
 });
 
+app.get("/today-widget", async (req, res) => {
+  const { gameName, tagLine, region } = req.query;
+  if (!gameName || !tagLine || !region) return res.sendStatus(400);
+
+  const account = await getAccount(gameName, tagLine, region);
+
+  const startOfDay = Math.floor(
+    new Date().setHours(0,0,0,0) / 1000
+  );
+
+  const ids = await fetch(
+    `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${account.puuid}/ids?startTime=${startOfDay}&count=20`,
+    { headers: { "X-Riot-Token": process.env.RIOT_API_KEY } }
+  ).then(r => r.json());
+
+  let wins = 0, losses = 0;
+
+  for (const id of ids) {
+    const match = await fetch(
+      `https://${region}.api.riotgames.com/lol/match/v5/matches/${id}`,
+      { headers: { "X-Riot-Token": process.env.RIOT_API_KEY } }
+    ).then(r => r.json());
+
+    const p = match.info.participants.find(p => p.puuid === account.puuid);
+    p?.win ? wins++ : losses++;
+  }
+
+  res.type("html").send(`
+    <html>
+      <body style="
+        background:transparent;
+        color:white;
+        font-size:140px;
+        font-family:sans-serif;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100%;
+      ">
+        <div>W ${wins} | L ${losses}</div>
+
+        <script>
+          setTimeout(() => location.reload(), 600000);
+        </script>
+      </body>
+    </html>
+  `);
+});
 
 
 export default app;
+
 
 
 
